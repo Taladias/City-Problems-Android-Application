@@ -5,12 +5,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -55,6 +58,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.cityproblemsapplication.ui.theme.CityProblemsApplicationTheme
+import com.example.cityproblemsapplication.ui.theme.righteousFontFamily
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,6 +73,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        
     }
 }
 
@@ -96,8 +101,8 @@ fun HomeScreen(navController: NavController) {
         modifier = Modifier
             .fillMaxSize()
             .blur(
-                radiusX = 10.dp,
-                radiusY = 10.dp,
+                radiusX = 3.dp,
+                radiusY = 3.dp,
                 edgeTreatment = BlurredEdgeTreatment(RoundedCornerShape(8.dp))
             )
     )
@@ -111,20 +116,20 @@ fun HomeScreen(navController: NavController) {
         Text(
             text = "City Issues",
             fontSize = 50.sp,
-            //fontFamily = righteousFontFamily,
+            fontFamily = righteousFontFamily,
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
         Text(
             text = "Report issues in our city quickly and easily, helping us keep our community safe and well-maintained.",
             fontSize = 24.sp,
-            //fontFamily = righteousFontFamily,
+            fontFamily = righteousFontFamily,
             modifier = Modifier.padding(start = 16.dp)
         )
 
         Spacer(
             modifier = Modifier
-                .height(250.dp)
+                .height(350.dp)
 
         )
 
@@ -139,7 +144,7 @@ fun HomeScreen(navController: NavController) {
         ) {
             Text(
                 text = "Report a problem",
-                //fontFamily = righteousFontFamily,
+                fontFamily = righteousFontFamily,
                 fontSize = 23.sp
             )
         }
@@ -150,23 +155,29 @@ fun HomeScreen(navController: NavController) {
 
         )
 
-        Button(
-            onClick = {},
+        Box (
             modifier = Modifier
-                .fillMaxWidth(0.8f)
-                .height(56.dp)
-                .shadow(elevation = 10.dp, shape = RoundedCornerShape(28.dp)),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFD7998E)
-            )
+                .fillMaxHeight()
 
-        )
-        {
-            Text(
-                text = "View problems",
-                //fontFamily = righteousFontFamily,
-                fontSize = 23.sp
+        ){
+            Button(
+                onClick = {navController.navigate("location")},
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .height(56.dp)
+                    .shadow(elevation = 10.dp, shape = RoundedCornerShape(28.dp)),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFD7998E)
+                )
+
             )
+            {
+                Text(
+                    text = "View problems",
+                    fontFamily = righteousFontFamily,
+                    fontSize = 23.sp
+                )
+            }
         }
     }
 }
@@ -174,6 +185,10 @@ fun HomeScreen(navController: NavController) {
 
 @Composable
 fun SubmitProblemScreen() {
+
+    var description by remember { mutableStateOf("") }
+
+    var selectedCategory by remember { mutableStateOf("") }
 
 
     Image(
@@ -189,48 +204,105 @@ fun SubmitProblemScreen() {
             )
     )
 
- Column(
+    Box (
         modifier = Modifier
             .fillMaxSize()
-            .padding(64.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(16.dp)
     ) {
-        Text(
-            text = "Submit a Problem",
-            fontSize = 32.sp,
-            modifier = Modifier.padding(bottom = 24.dp)
-        )
-
-     AutoCompleteDropdown()
-
-     Spacer(
-         modifier = Modifier.height(300.dp)
-     )
-
-        Button(
-            onClick = { /* Submit form to database */ },
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(top = 64.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text("Submit")
+            Text(
+                text = "Submit a Problem",
+                fontSize = 40.sp,
+                fontFamily = righteousFontFamily,
+                modifier = Modifier.padding(bottom = 24.dp)
+            )
+
+            AutoCompleteDropdown(selectedCategory) { selectedCategory = it }
+
+            Text(
+                text = "Description of the problem",
+                fontFamily = righteousFontFamily,
+                fontSize = 24.sp,
+                modifier = Modifier.padding(bottom = 24.dp)
+            )
+
+            ProblemDescriptionField(description = description, onDescriptionChange = {description = it})
+
+
+
+
+            Spacer(
+                modifier = Modifier.height(300.dp)
+            )
+
         }
     }
+
+    Box (
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 50.dp),
+        contentAlignment = Alignment.BottomCenter
+    ){
+        Button(
+            onClick = {},
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        ) {
+            Text("Submit to database")
+        }
+    }
+
 }
 
+@Composable
+fun ProblemDescriptionField(description: String, onDescriptionChange: (String) -> Unit) {
+    TextField(
+        value = description,
+        onValueChange = onDescriptionChange,
+        label = { Text("Description") },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(150.dp)
+            .border(2.dp, Color.Black, RoundedCornerShape(2.dp))
+            .background(Color.White),
+        maxLines = 5,
+        singleLine = false,
+        placeholder = { Text("Describe the problem in detail...") },
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color.White,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent
+        )
+
+
+
+
+
+
+        )
+
+}
 
 @Composable
-fun AutoCompleteDropdown() {
+fun AutoCompleteDropdown(selectedCategory: String, onCategorySelected: (String) -> Unit) {
 
     val problems = listOf(
         "Road Damage", "Sidewalk blocked", "Cracked sidewalk",
         "Collapsed or broken bridge", "Clogged drainage", "Public transport delay",
         "Non-functional traffic lights", "Overcrowded area", "Construction blockades",
         "Littered area", "Broken pipeline", "Power outage", "Noise pollution",
-        "Broken streetlights"
+        "Broken streetlights", "Other"
     )
 
-    var category by remember { mutableStateOf("") }
+    var category by remember { mutableStateOf(selectedCategory) }
 
     val heightTextFields by remember { mutableStateOf(55.dp) }
 
@@ -276,12 +348,15 @@ fun AutoCompleteDropdown() {
                             color = Color.Black,
                             shape = RoundedCornerShape(15.dp)
                         )
-                        .onGloballyPositioned { coordinates -> textFieldSize = coordinates.size.toSize() },
+                        .onGloballyPositioned { coordinates ->
+                            textFieldSize = coordinates.size.toSize()
+                        },
 
                     value = category,
                     onValueChange = {
                         category = it
                         expanded = true
+                        onCategorySelected(it)
                     },
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.White,

@@ -36,14 +36,25 @@ android {
     }
     buildFeatures {
         compose = true
+        viewBinding = true
+    }
+    packaging{
+        resources{
+            excludes += "META-INF/native-image/native-image.properties"
+            excludes += "META-INF/native-image/reflect-config.json"
+        }
     }
 }
 
 dependencies {
 
     implementation(libs.androidx.core.ktx)
+    implementation(libs.kotlin.reflect)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+    implementation(libs.gson)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
